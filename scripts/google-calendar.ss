@@ -8,8 +8,8 @@ searchCalendarEvents = (googleToken: string, calendarId: string, query: string, 
   res = httpRequest({ host: "www.googleapis.com", method: "GET", path: path.result, headers: { "authorization": auth.result } })
   isHtml = stringIncludes({ haystack: stringLower({ text: res.body }).result, needle: "<html" })
   shouldParse = res.status == 200 ? (isHtml.result ? false : true) : false
-  parsed = shouldParse ? jsonParse({ text: res.body }) : { items: [] }
-  items = parsed.items ? parsed.items : []
+  parsed = shouldParse ? jsonParse({ text: res.body }) : { value: { items: [] } }
+  items = parsed.value.items ? parsed.value.items : []
   return items
 }
 
@@ -20,8 +20,8 @@ createCalendarEvent = (googleToken: string, calendarId: string, summary: string,
   res = httpRequest({ host: "www.googleapis.com", method: "POST", path: path.result, headers: { "authorization": auth.result, "content-type": "application/json" }, body: body.text })
   isHtml = stringIncludes({ haystack: stringLower({ text: res.body }).result, needle: "<html" })
   shouldParse = res.status == 200 ? (isHtml.result ? false : true) : false
-  parsed = shouldParse ? jsonParse({ text: res.body }) : { id: "", htmlLink: "" }
-  return { id: parsed.id, link: parsed.htmlLink }
+  parsed = shouldParse ? jsonParse({ text: res.body }) : { value: { id: "", htmlLink: "" } }
+  return { id: parsed.value.id, link: parsed.value.htmlLink }
 }
 
 updateCalendarEvent = (googleToken: string, calendarId: string, eventId: string, summary: string, desc: string, location: string): { id: string, link: string } => {
@@ -32,8 +32,8 @@ updateCalendarEvent = (googleToken: string, calendarId: string, eventId: string,
   res = httpRequest({ host: "www.googleapis.com", method: "PATCH", path: path.result, headers: { "authorization": auth.result, "content-type": "application/json" }, body: body.text })
   isHtml = stringIncludes({ haystack: stringLower({ text: res.body }).result, needle: "<html" })
   shouldParse = res.status == 200 ? (isHtml.result ? false : true) : false
-  parsed = shouldParse ? jsonParse({ text: res.body }) : { id: "", htmlLink: "" }
-  return { id: parsed.id, link: parsed.htmlLink }
+  parsed = shouldParse ? jsonParse({ text: res.body }) : { value: { id: "", htmlLink: "" } }
+  return { id: parsed.value.id, link: parsed.value.htmlLink }
 }
 
 deleteCalendarEvent = (googleToken: string, calendarId: string, eventId: string): { success: boolean } => {
