@@ -16,46 +16,81 @@ Add these secrets to your bot with matching host allowlists:
 
 ## Usage Pattern
 
-**The secret name parameter must end with `Secretname`** so prompt2bot resolves it before passing to safescript.
+The agent calls safescript functions with two arguments:
+
+1. **params**: The actual parameter values
+2. **secretMapping**: Object mapping parameter names to secret names
 
 ### Calendly
 
 1. List event types:
    ```
-   getCalendlyEventTypes("calendly-token")
+   run_safescript({
+     code: <calendly.ss>,
+     functionName: "getCalendlyEventTypes",
+     args: {
+       params: {},
+       secretMapping: { calendlyToken: "calendly-token" }
+     }
+   })
    ```
 
-2. Get available slots (pass ISO timestamps):
+2. Get available slots:
    ```
-   getCalendlyAvailableSlots("calendly-token", "2024-01-15T09:00:00Z", "2024-01-15T17:00:00Z")
+   run_safescript({
+     code: <calendly.ss>,
+     functionName: "getCalendlyAvailableSlots",
+     args: {
+       params: { startTime: "2024-01-15T09:00:00Z", endTime: "2024-01-15T17:00:00Z" },
+       secretMapping: { calendlyToken: "calendly-token" }
+     }
+   })
    ```
 
 ### Google Calendar
 
 1. Search events:
    ```
-   searchCalendarEvents("google-calendar", "your-calendar-id", "meeting", "2024-01-15T00:00:00Z", "2024-01-16T00:00:00Z")
+   run_safescript({
+     code: <google-calendar.ss>,
+     functionName: "searchCalendarEvents",
+     args: {
+       params: { calendarId: "primary", query: "meeting", timeMin: "2024-01-15T00:00:00Z", timeMax: "2024-01-16T00:00:00Z" },
+       secretMapping: { googleToken: "google-calendar" }
+     }
+   })
    ```
 
 2. Create event:
    ```
-   createCalendarEvent("google-calendar", "primary", "Team Standup", "Daily sync", "2024-01-15T09:00:00Z", "2024-01-15T09:30:00Z", "Zoom")
+   run_safescript({
+     code: <google-calendar.ss>,
+     functionName: "createCalendarEvent",
+     args: {
+       params: { calendarId: "primary", summary: "Team Standup", desc: "Daily sync", start: "2024-01-15T09:00:00Z", endTime: "2024-01-15T09:30:00Z", location: "Zoom" },
+       secretMapping: { googleToken: "google-calendar" }
+     }
+   })
    ```
 
-3. Update event:
+3. Delete event:
    ```
-   updateCalendarEvent("google-calendar", "primary", "event-id", "Updated Title", "New description", "")
-   ```
-
-4. Delete event:
-   ```
-   deleteCalendarEvent("google-calendar", "primary", "event-id")
+   run_safescript({
+     code: <google-calendar.ss>,
+     functionName: "deleteCalendarEvent",
+     args: {
+       params: { calendarId: "primary", eventId: "abc123..." },
+       secretMapping: { googleToken: "google-calendar" }
+     }
+   })
    ```
 
 ## How It Works
 
-These are safescript functions that get converted to tools. Prompt2bot:
+These are safescript functions converted to tools. Prompt2bot:
 1. Statically analyzes which hosts each function contacts
 2. Validates against bot secret host policies
-3. **Resolves secret names** (parameters ending in `Secretname`) before execution
+3. **Resolves secrets** via secretMapping before execution
 4. Returns results to the agent
+
+The `secretMapping` ensures the agent explicitly declares which parameters should use secrets, enabling audit and security review.
