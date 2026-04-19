@@ -9,7 +9,7 @@ searchCalendarEvents = (googleToken: string, calendarId: string, query: string, 
   isHtml = stringIncludes({ haystack: stringLower({ text: res.body }).result, needle: "<html" })
   shouldParse = res.status == 200 ? (isHtml.result ? false : true) : false
   parsed = shouldParse ? jsonParse({ text: res.body }) : { value: { items: [] } }
-  items = parsed.value.items == null ? [] : parsed.value.items
+  items = parsed.value.items ? parsed.value.items : []
   return items
 }
 
