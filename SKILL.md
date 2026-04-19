@@ -9,28 +9,30 @@ Tools for checking availability and scheduling meetings through Calendly and Goo
 
 ## Calendly Functions
 
-### getCalendlyEventTypes(calendlyToken)
+### getCalendlyEventTypes(calendlyTokenSecretName)
 Returns your available event types.
 
-### getCalendlyAvailableSlots(calendlyToken, startTime, endTime)
+### getCalendlyAvailableSlots(calendlyTokenSecretName, startTime, endTime)
 Returns available slots for booking. `startTime` and `endTime` are ISO timestamps.
 
 ## Google Calendar Functions
 
-### searchCalendarEvents(googleToken, calendarId, query, timeMin, timeMax)
+### searchCalendarEvents(googleTokenSecretName, calendarId, query, timeMin, timeMax)
 Search events in a calendar. `timeMin`/`timeMax` are ISO timestamps.
 
-### createCalendarEvent(googleToken, calendarId, summary, desc, start, endTime, location)
+### createCalendarEvent(googleTokenSecretName, calendarId, summary, desc, start, endTime, location)
 Create a new calendar event.
 
-### updateCalendarEvent(googleToken, calendarId, eventId, summary, desc, location)
+### updateCalendarEvent(googleTokenSecretName, calendarId, eventId, summary, desc, location)
 Update an existing event. Only provide fields to change.
 
-### deleteCalendarEvent(googleToken, calendarId, eventId)
+### deleteCalendarEvent(googleTokenSecretName, calendarId, eventId)
 Delete an event from the calendar.
 
 ## Secret Requirements
 
-The `calendlyToken` and `googleToken` parameters should be mapped to secrets:
+Pass the secret name (not the actual token) as the `*SecretName` parameter:
 - `calendly-token` - Calendly API token (host: `api.calendly.com`)
 - `google-calendar` - Google OAuth token (host: `www.googleapis.com`)
+
+When calling these functions, pass the secret name, e.g., `getCalendlyEventTypes("calendly-token")`

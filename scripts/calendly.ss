@@ -1,5 +1,5 @@
-getCalendlyEventTypes = (calendlyToken: string): { uri: string, name: string, slug: string, scheduling_url: string }[] => {
-  auth = stringConcat({ parts: ["Bearer ", calendlyToken] })
+getCalendlyEventTypes = (calendlyTokenSecretName: string): { uri: string, name: string, slug: string, scheduling_url: string }[] => {
+  auth = stringConcat({ parts: ["Bearer ", calendlyTokenSecretName] })
   userRes = httpRequest({ host: "api.calendly.com", method: "GET", path: "/users/me", headers: { "Authorization": auth.result } })
   isHtml1 = stringIncludes({ haystack: stringLower({ text: userRes.body }).result, needle: "<html" })
   shouldParse1 = userRes.status == 200 ? (isHtml1.result ? false : true) : false
@@ -15,8 +15,8 @@ getCalendlyEventTypes = (calendlyToken: string): { uri: string, name: string, sl
   return eventTypes
 }
 
-getCalendlyAvailableSlots = (calendlyToken: string, startTime: string, endTime: string): { name: string, slug: string, slots: { start_time: string, status: string }[] } => {
-  auth = stringConcat({ parts: ["Bearer ", calendlyToken] })
+getCalendlyAvailableSlots = (calendlyTokenSecretName: string, startTime: string, endTime: string): { name: string, slug: string, slots: { start_time: string, status: string }[] } => {
+  auth = stringConcat({ parts: ["Bearer ", calendlyTokenSecretName] })
   userRes = httpRequest({ host: "api.calendly.com", method: "GET", path: "/users/me", headers: { "Authorization": auth.result } })
   isHtml1 = stringIncludes({ haystack: stringLower({ text: userRes.body }).result, needle: "<html" })
   shouldParse1 = userRes.status == 200 ? (isHtml1.result ? false : true) : false
