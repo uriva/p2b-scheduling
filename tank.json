@@ -1,0 +1,17 @@
+{
+  "name": "@uriva/p2b-scheduling",
+  "version": "0.1.1",
+  "description": "Scheduling utils using safescript.",
+  "visibility": "private",
+  "skills": {},
+  "permissions": {
+    "network": {
+      "outbound": []
+    },
+    "filesystem": {
+      "read": [],
+      "write": []
+    },
+    "subprocess": false
+  }
+}
