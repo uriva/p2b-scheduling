@@ -1,23 +1,38 @@
 getCalendlyEventTypes = (calendlyToken: string): { uri: string, name: string, slug: string, schedulingUrl: string }[] => {
   auth = stringConcat({ parts: ["Bearer ", calendlyToken] })
   userRes = httpRequest({ host: "api.calendly.com", method: "GET", path: "/users/me", headers: { "Authorization": auth.result } })
-  userData = jsonParse({ text: userRes.body })
-  eventsPath = stringConcat({ parts: ["/event_types?user=", userData.resource.uri] })
+  isHtml1 = stringIncludes({ haystack: stringLower({ text: userRes.body }).result, needle: "<html" })
+  shouldParse1 = userRes.status == 200 ? (isHtml1.result ? false : true) : false
+  userData = shouldParse1 ? jsonParse({ text: userRes.body }) : { value: { resource: { uri: "" } } }
+  encodedUserUri = urlEncode({ text: userData.value.resource.uri })
+  eventsPath = stringConcat({ parts: ["/event_types?user=", encodedUserUri.encoded] })
   eventsRes = httpRequest({ host: "api.calendly.com", method: "GET", path: eventsPath.result, headers: { "Authorization": auth.result } })
-  eventsData = jsonParse({ text: eventsRes.body })
-  return eventsData.collection
+  isHtml2 = stringIncludes({ haystack: stringLower({ text: eventsRes.body }).result, needle: "<html" })
+  shouldParse2 = eventsRes.status == 200 ? (isHtml2.result ? false : true) : false
+  eventsData = shouldParse2 ? jsonParse({ text: eventsRes.body }) : { value: { collection: [] } }
+  return eventsData.value.collection
 }
 
 getCalendlyAvailableSlots = (calendlyToken: string, startTime: string, endTime: string): { name: string, slug: string, slots: { startTime: string, url: string }[] } => {
   auth = stringConcat({ parts: ["Bearer ", calendlyToken] })
   userRes = httpRequest({ host: "api.calendly.com", method: "GET", path: "/users/me", headers: { "Authorization": auth.result } })
-  userData = jsonParse({ text: userRes.body })
-  eventsPath = stringConcat({ parts: ["/event_types?user=", userData.resource.uri] })
+  isHtml1 = stringIncludes({ haystack: stringLower({ text: userRes.body }).result, needle: "<html" })
+  shouldParse1 = userRes.status == 200 ? (isHtml1.result ? false : true) : false
+  userData = shouldParse1 ? jsonParse({ text: userRes.body }) : { value: { resource: { uri: "" } } }
+  encodedUserUri = urlEncode({ text: userData.value.resource.uri })
+  eventsPath = stringConcat({ parts: ["/event_types?user=", encodedUserUri.encoded] })
   eventsRes = httpRequest({ host: "api.calendly.com", method: "GET", path: eventsPath.result, headers: { "Authorization": auth.result } })
-  eventsData = jsonParse({ text: eventsRes.body })
-  event = eventsData.collection[0]
-  slotsPath = stringConcat({ parts: ["/event_type_available_times?event_type=", event.uri, "&start_time=", startTime, "&end_time=", endTime] })
+  isHtml2 = stringIncludes({ haystack: stringLower({ text: eventsRes.body }).result, needle: "<html" })
+  shouldParse2 = eventsRes.status == 200 ? (isHtml2.result ? false : true) : false
+  eventsData = shouldParse2 ? jsonParse({ text: eventsRes.body }) : { value: { collection: [] } }
+  event = eventsData.value.collection[0]
+  encodedEventUri = urlEncode({ text: event.uri })
+  encodedStartTime = urlEncode({ text: startTime })
+  encodedEndTime = urlEncode({ text: endTime })
+  slotsPath = stringConcat({ parts: ["/event_type_available_times?event_type=", encodedEventUri.encoded, "&start_time=", encodedStartTime.encoded, "&end_time=", encodedEndTime.encoded] })
   slotsRes = httpRequest({ host: "api.calendly.com", method: "GET", path: slotsPath.result, headers: { "Authorization": auth.result } })
-  slotsData = jsonParse({ text: slotsRes.body })
-  return { name: event.name, slug: event.slug, slots: slotsData.collection }
+  isHtml3 = stringIncludes({ haystack: stringLower({ text: slotsRes.body }).result, needle: "<html" })
+  shouldParse3 = slotsRes.status == 200 ? (isHtml3.result ? false : true) : false
+  slotsData = shouldParse3 ? jsonParse({ text: slotsRes.body }) : { value: { collection: [] } }
+  return { name: event.name, slug: event.slug, slots: slotsData.value.collection }
 }
