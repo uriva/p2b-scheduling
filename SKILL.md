@@ -9,30 +9,34 @@ Tools for checking availability and scheduling meetings through Calendly and Goo
 
 ## Calendly Functions
 
-### getCalendlyEventTypes(calendlyTokenSecretName)
+### getCalendlyEventTypes(calendlyToken)
 Returns your available event types.
 
-### getCalendlyAvailableSlots(calendlyTokenSecretName, startTime, endTime)
+### getCalendlyAvailableSlots(calendlyToken, startTime, endTime)
 Returns available slots for booking. `startTime` and `endTime` are ISO timestamps.
 
 ## Google Calendar Functions
 
-### searchCalendarEvents(googleTokenSecretName, calendarId, query, timeMin, timeMax)
+### searchCalendarEvents(googleToken, calendarId, query, timeMin, timeMax)
 Search events in a calendar. `timeMin`/`timeMax` are ISO timestamps.
 
-### createCalendarEvent(googleTokenSecretName, calendarId, summary, desc, start, endTime, location)
+### createCalendarEvent(googleToken, calendarId, summary, desc, start, endTime, location)
 Create a new calendar event.
 
-### updateCalendarEvent(googleTokenSecretName, calendarId, eventId, summary, desc, location)
+### updateCalendarEvent(googleToken, calendarId, eventId, summary, desc, location)
 Update an existing event. Only provide fields to change.
 
-### deleteCalendarEvent(googleTokenSecretName, calendarId, eventId)
+### deleteCalendarEvent(googleToken, calendarId, eventId)
 Delete an event from the calendar.
 
-## Secret Requirements
+## Usage
 
-Pass the secret name (not the actual token) as the `*SecretName` parameter:
-- `calendly-token` - Calendly API token (host: `api.calendly.com`)
-- `google-calendar` - Google OAuth token (host: `www.googleapis.com`)
+Pass secret names as the token parameters:
+- For Calendly: pass `"calendly-token"` as the `calendlyToken` parameter
+- For Google Calendar: pass `"google-calendar"` as the `googleToken` parameter
 
-When calling these functions, pass the secret name, e.g., `getCalendlyEventTypes("calendly-token")`
+Example:
+```
+getCalendlyEventTypes("calendly-token")
+searchCalendarEvents("google-calendar", "primary", "meeting", "2026-04-19T00:00:00Z", "2026-04-20T00:00:00Z")
+```
