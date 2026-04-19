@@ -1,6 +1,6 @@
 ---
 name: scheduling
-description: AI agent skill for scheduling meetings via Calendly and Google Calendar. Check availability, find slots, and manage calendar events using the calendly-token and google-calendar secrets.
+description: AI agent skill for scheduling meetings via Calendly and Google Calendar. Uses safescript for secure, statically-analyzed API calls.
 ---
 
 # Scheduling Skill
@@ -9,30 +9,53 @@ This skill provides tools for checking availability and scheduling meetings thro
 
 ## Secrets Required
 
-- `calendly-token`: Your Calendly API token (for Calendly operations)
-- `google-calendar`: Your Google OAuth access token (for Google Calendar operations)
+Add these secrets to your bot with matching host allowlists:
 
-## Tools
+- `calendly-token`: Calendly API token (host: `api.calendly.com`)
+- `google-calendar`: Google OAuth access token (host: `www.googleapis.com`)
 
-### Calendly Tools
+## Usage Pattern
 
-- **get_calendly_available_slots**: Get available meeting slots from Calendly for a time range
-- **get_calendly_event_types**: List your Calendly event types
+**The secret name parameter must end with `Secretname`** so prompt2bot resolves it before passing to safescript.
 
-### Google Calendar Tools
+### Calendly
 
-- **search_calendar_events**: Search for events in a Google Calendar within a time range
-- **create_calendar_event**: Create a new event in a Google Calendar
-- **update_calendar_event**: Update an existing event in a Google Calendar
-- **delete_calendar_event**: Delete an event from a Google Calendar
+1. List event types:
+   ```
+   getCalendlyEventTypes("calendly-token")
+   ```
 
-## Usage
+2. Get available slots (pass ISO timestamps):
+   ```
+   getCalendlyAvailableSlots("calendly-token", "2024-01-15T09:00:00Z", "2024-01-15T17:00:00Z")
+   ```
 
-1. First, use `get_calendly_event_types` to see your available event types
-2. Use `get_calendly_available_slots` with IANA timezone (e.g., "America/New_York") and local time range (e.g., "2024-01-15T09:00", "2024-01-15T17:00") to find available slots
-3. Share the booking URL with the user to let them schedule
+### Google Calendar
 
-For Google Calendar:
-- Use `search_calendar_events` with calendar ID and query to find events
-- Use `create_calendar_event` to add new events
-- Calendar IDs are typically in the format: `<account>@group.calendar.google.com`
+1. Search events:
+   ```
+   searchCalendarEvents("google-calendar", "your-calendar-id", "meeting", "2024-01-15T00:00:00Z", "2024-01-16T00:00:00Z")
+   ```
+
+2. Create event:
+   ```
+   createCalendarEvent("google-calendar", "primary", "Team Standup", "Daily sync", "2024-01-15T09:00:00Z", "2024-01-15T09:30:00Z", "Zoom")
+   ```
+
+3. Update event:
+   ```
+   updateCalendarEvent("google-calendar", "primary", "event-id", "Updated Title", "New description", "")
+   ```
+
+4. Delete event:
+   ```
+   deleteCalendarEvent("google-calendar", "primary", "event-id")
+   ```
+
+## How It Works
+
+These are safescript functions that get converted to tools. Prompt2bot:
+1. Statically analyzes which hosts each function contacts
+2. Validates against bot secret host policies
+3. **Resolves secret names** (parameters ending in `Secretname`) before execution
+4. Returns results to the agent

@@ -1,5 +1,5 @@
-getCalendlyEventTypes = (calendlyToken: string): { uri: string, name: string, slug: string, schedulingUrl: string }[] => {
-  auth = stringConcat({ parts: ["Bearer ", calendlyToken] })
+getCalendlyEventTypes = (calendlyTokenSecretname: string): { uri: string, name: string, slug: string, schedulingUrl: string }[] => {
+  auth = stringConcat({ parts: ["Bearer ", calendlyTokenSecretname] })
   userRes = httpRequest({ host: "api.calendly.com", method: "GET", path: "/users/me", headers: auth })
   userData = jsonParse({ text: userRes.body })
   eventsPath = stringConcat({ parts: ["/event_types?user=", userData.resource.uri] })
@@ -8,8 +8,8 @@ getCalendlyEventTypes = (calendlyToken: string): { uri: string, name: string, sl
   return eventsData.collection
 }
 
-getCalendlyAvailableSlots = (calendlyToken: string, startTime: string, endTime: string): { name: string, slug: string, slots: { startTime: string, url: string }[] } => {
-  auth = stringConcat({ parts: ["Bearer ", calendlyToken] })
+getCalendlyAvailableSlots = (calendlyTokenSecretname: string, startTime: string, endTime: string): { name: string, slug: string, slots: { startTime: string, url: string }[] } => {
+  auth = stringConcat({ parts: ["Bearer ", calendlyTokenSecretname] })
   userRes = httpRequest({ host: "api.calendly.com", method: "GET", path: "/users/me", headers: auth })
   userData = jsonParse({ text: userRes.body })
   eventsPath = stringConcat({ parts: ["/event_types?user=", userData.resource.uri] })
