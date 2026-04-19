@@ -1,23 +1,23 @@
 getCalendlyEventTypes = (calendlyToken: string): { uri: string, name: string, slug: string, schedulingUrl: string }[] => {
   auth = stringConcat({ parts: ["Bearer ", calendlyToken] })
-  userRes = httpRequest({ host: "api.calendly.com", method: "GET", path: "/users/me", headers: auth })
+  userRes = httpRequest({ host: "api.calendly.com", method: "GET", path: "/users/me", headers: { "Authorization": auth.result } })
   userData = jsonParse({ text: userRes.body })
   eventsPath = stringConcat({ parts: ["/event_types?user=", userData.resource.uri] })
-  eventsRes = httpRequest({ host: "api.calendly.com", method: "GET", path: eventsPath.result, headers: auth })
+  eventsRes = httpRequest({ host: "api.calendly.com", method: "GET", path: eventsPath.result, headers: { "Authorization": auth.result } })
   eventsData = jsonParse({ text: eventsRes.body })
   return eventsData.collection
 }
 
 getCalendlyAvailableSlots = (calendlyToken: string, startTime: string, endTime: string): { name: string, slug: string, slots: { startTime: string, url: string }[] } => {
   auth = stringConcat({ parts: ["Bearer ", calendlyToken] })
-  userRes = httpRequest({ host: "api.calendly.com", method: "GET", path: "/users/me", headers: auth })
+  userRes = httpRequest({ host: "api.calendly.com", method: "GET", path: "/users/me", headers: { "Authorization": auth.result } })
   userData = jsonParse({ text: userRes.body })
   eventsPath = stringConcat({ parts: ["/event_types?user=", userData.resource.uri] })
-  eventsRes = httpRequest({ host: "api.calendly.com", method: "GET", path: eventsPath.result, headers: auth })
+  eventsRes = httpRequest({ host: "api.calendly.com", method: "GET", path: eventsPath.result, headers: { "Authorization": auth.result } })
   eventsData = jsonParse({ text: eventsRes.body })
   event = eventsData.collection[0]
   slotsPath = stringConcat({ parts: ["/event_type_available_times?event_type=", event.uri, "&start_time=", startTime, "&end_time=", endTime] })
-  slotsRes = httpRequest({ host: "api.calendly.com", method: "GET", path: slotsPath.result, headers: auth })
+  slotsRes = httpRequest({ host: "api.calendly.com", method: "GET", path: slotsPath.result, headers: { "Authorization": auth.result } })
   slotsData = jsonParse({ text: slotsRes.body })
   return { name: event.name, slug: event.slug, slots: slotsData.collection }
 }
