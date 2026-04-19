@@ -18,18 +18,18 @@ Add these secrets to your bot with matching host allowlists:
 
 The agent calls safescript functions with two arguments:
 
-1. **params**: The actual parameter values
-2. **secretMapping**: Object mapping parameter names to secret names
+1. **params**: The parameter values (non-secret params go here)
+2. **secretMapping**: Maps parameter names that should use secrets to secret names
 
 ### Calendly
 
-1. List event types:
+1. List event types - `calendlyToken` is mapped to `calendly-token` secret:
    ```
    run_safescript({
      code: <calendly.ss>,
      functionName: "getCalendlyEventTypes",
      args: {
-       params: {},
+       params: { calendlyToken: "" },
        secretMapping: { calendlyToken: "calendly-token" }
      }
    })
@@ -41,7 +41,7 @@ The agent calls safescript functions with two arguments:
      code: <calendly.ss>,
      functionName: "getCalendlyAvailableSlots",
      args: {
-       params: { startTime: "2024-01-15T09:00:00Z", endTime: "2024-01-15T17:00:00Z" },
+       params: { calendlyToken: "", startTime: "2024-01-15T09:00:00Z", endTime: "2024-01-15T17:00:00Z" },
        secretMapping: { calendlyToken: "calendly-token" }
      }
    })
@@ -55,7 +55,7 @@ The agent calls safescript functions with two arguments:
      code: <google-calendar.ss>,
      functionName: "searchCalendarEvents",
      args: {
-       params: { calendarId: "primary", query: "meeting", timeMin: "2024-01-15T00:00:00Z", timeMax: "2024-01-16T00:00:00Z" },
+       params: { googleToken: "", calendarId: "primary", query: "meeting", timeMin: "2024-01-15T00:00:00Z", timeMax: "2024-01-16T00:00:00Z" },
        secretMapping: { googleToken: "google-calendar" }
      }
    })
@@ -67,7 +67,7 @@ The agent calls safescript functions with two arguments:
      code: <google-calendar.ss>,
      functionName: "createCalendarEvent",
      args: {
-       params: { calendarId: "primary", summary: "Team Standup", desc: "Daily sync", start: "2024-01-15T09:00:00Z", endTime: "2024-01-15T09:30:00Z", location: "Zoom" },
+       params: { googleToken: "", calendarId: "primary", summary: "Team Standup", desc: "Daily sync", start: "2024-01-15T09:00:00Z", endTime: "2024-01-15T09:30:00Z", location: "Zoom" },
        secretMapping: { googleToken: "google-calendar" }
      }
    })
@@ -79,7 +79,7 @@ The agent calls safescript functions with two arguments:
      code: <google-calendar.ss>,
      functionName: "deleteCalendarEvent",
      args: {
-       params: { calendarId: "primary", eventId: "abc123..." },
+       params: { googleToken: "", calendarId: "primary", eventId: "abc123..." },
        secretMapping: { googleToken: "google-calendar" }
      }
    })
@@ -87,10 +87,12 @@ The agent calls safescript functions with two arguments:
 
 ## How It Works
 
-These are safescript functions converted to tools. Prompt2bot:
-1. Statically analyzes which hosts each function contacts
-2. Validates against bot secret host policies
-3. **Resolves secrets** via secretMapping before execution
-4. Returns results to the agent
+These are safescript functions converted to tools. When the agent calls:
 
-The `secretMapping` ensures the agent explicitly declares which parameters should use secrets, enabling audit and security review.
+1. Prompt2bot parses the script and function signature
+2. **Validates**: script's target hosts ⊆ secret's allowed hosts
+3. **Resolves secrets** via secretMapping - replaces param values with actual secret values
+4. Executes the safescript with resolved params
+5. Returns results to the agent
+
+The `secretMapping` ensures explicit, auditable coupling between params and secrets.
