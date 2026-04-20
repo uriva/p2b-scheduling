@@ -1,6 +1,6 @@
 {
   "name": "@uriva/p2b-scheduling",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "repository": "https://github.com/uriva/p2b-scheduling",
   "description": "Scheduling utils using safescript.",
   "visibility": "public",
