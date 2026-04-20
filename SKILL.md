@@ -10,21 +10,21 @@ Tools for checking availability and scheduling meetings through Calendly and Goo
 ## Calendly Functions
 
 ### getCalendlyEventTypes(calendlyToken)
-Returns your available event types.
+Returns `{ success, result, error }` where `result` contains available event types.
 
 ### getCalendlyAvailableSlots(calendlyToken, startTime, endTime)
-Returns available slots for booking. `startTime` and `endTime` are ISO timestamps.
+Returns `{ success, result, error }` where `result` contains available slots. `startTime` and `endTime` are ISO timestamps.
 
 ## Google Calendar Functions
 
 ### searchCalendarEvents(googleToken, calendarId, query, timeMin, timeMax)
-Search events in a calendar. `timeMin`/`timeMax` are ISO timestamps.
+Search events in a calendar and return `{ success, result, error }`. `timeMin`/`timeMax` are ISO timestamps.
 
 ### createCalendarEvent(googleToken, calendarId, summary, desc, start, endTime, location)
-Create a new calendar event.
+Create a new calendar event and return `{ success, result, error }`.
 
 ### updateCalendarEvent(googleToken, calendarId, eventId, summary, desc, location)
-Update an existing event. Only provide fields to change.
+Update an existing event and return `{ success, result, error }`. Only provide fields to change.
 
 ### deleteCalendarEvent(googleToken, calendarId, eventId)
 Delete an event from the calendar.
@@ -34,6 +34,8 @@ Delete an event from the calendar.
 Pass secret names as the token parameters:
 - For Calendly: pass `"calendly-token"` as the `calendlyToken` parameter
 - For Google Calendar: pass `"google-calendar"` as the `googleToken` parameter
+
+Do not pass env var names like `GOOGLE_CALENDAR_TOKEN` or `CALENDLY_TOKEN` as token values. The skill expects the configured secret name, and using env var names will cause auth failures.
 
 Example:
 ```
